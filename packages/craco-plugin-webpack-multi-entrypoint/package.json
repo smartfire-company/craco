@@ -1,0 +1,39 @@
+{
+    "name": "@craco/craco-plugin-webpack-multi-entrypoint",
+    "description": "Create React App Configuration Override plugin to allow multiple entrypoints in your Webpack configuration.",
+    "scripts": {},
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sharegate/craco.git"
+    },
+    "keywords": [
+        "react",
+        "create-react-app",
+        "cra",
+        "craco",
+        "plugin"
+    ],
+    "author": "Groupe Sharegate inc.",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/sharegate/craco/issues"
+    },
+    "homepage": "https://github.com/sharegate/craco",
+    "engines": {
+        "node": ">=6"
+    },
+    "files": [
+        "index.js"
+    ],
+    "peerDependencies": {
+        "@craco/craco": "^2.0.2"
+    },
+    "devDependencies": {
+        "html-webpack-plugin": "^4.0.0-alpha.2",
+        "webpack": "^4.23.1"
+    },
+    "version": "1.0.0"
+}

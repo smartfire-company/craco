@@ -3,6 +3,7 @@ const merge = require("webpack-merge");
 const { isFunction, isString } = require("../utils");
 const { log } = require("../logger");
 const { overrideDevServerConfigProvider, loadDevServerConfigProvider } = require("../cra");
+const { applyDevServerConfigPlugins } = require("./plugins");
 
 function createConfigProviderProxy(cracoConfig, craDevServerConfigProvider, context) {
     const proxy = (proxy, allowedHost) => {
@@ -22,6 +23,12 @@ function createConfigProviderProxy(cracoConfig, craDevServerConfigProvider, cont
             // TODO: ensure is otherwise a plain object, if not, log an error.
             devServerConfig = merge(devServerConfig, cracoConfig.devServer);
         }
+
+        devServerConfig = applyDevServerConfigPlugins(cracoConfig, devServerConfig, {
+            ...context,
+            proxy,
+            allowedHost
+        });
 
         log("Overrided DevServer config.");
 

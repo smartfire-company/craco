@@ -14,6 +14,8 @@ function overrideCracoConfig({ plugin, options }, cracoConfig, context) {
         if (!resultingConfig) {
             throw new Error("craco: Plugin returned an undefined craco config.");
         }
+
+        return resultingConfig;
     }
 
     log("Overrided craco config with plugin.");
@@ -47,6 +49,8 @@ function overrideWebpack({ plugin, options }, cracoConfig, webpackConfig, contex
         if (!resultingConfig) {
             throw new Error("craco: Plugin returned an undefined webpack config.");
         }
+
+        return resultingConfig;
     }
 
     log("Overrided webpack config with plugin.");
@@ -80,6 +84,8 @@ function overrideJest({ plugin, options }, cracoConfig, jestConfig, context) {
         if (!resultingConfig) {
             throw new Error("craco: Plugin returned an undefined Jest config.");
         }
+
+        return resultingConfig;
     }
 
     log("Overrided Jest config with plugin.");
@@ -99,8 +105,44 @@ function applyJestConfigPlugins(cracoConfig, jestConfig, context) {
     return jestConfig;
 }
 
+/************  DevServer Config  *******************/
+
+function overrideDevServer({ plugin, options }, cracoConfig, devServerConfig, context) {
+    if (isFunction(plugin.overrideDevServerConfig)) {
+        const resultingConfig = plugin.overrideDevServerConfig({
+            cracoConfig: cracoConfig,
+            devServerConfig: devServerConfig,
+            pluginOptions: options,
+            context: context
+        });
+
+        if (!resultingConfig) {
+            throw new Error("craco: Plugin returned an undefined devServer config.");
+        }
+
+        return resultingConfig;
+    }
+
+    log("Overrided devServer config with plugin.");
+
+    return devServerConfig;
+}
+
+function applyDevServerConfigPlugins(cracoConfig, devServerConfig, context) {
+    if (isArray(cracoConfig.plugins)) {
+        cracoConfig.plugins.forEach(x => {
+            devServerConfig = overrideDevServer(x, cracoConfig, devServerConfig, context);
+        });
+    }
+
+    log("Applied devServer config plugins.");
+
+    return devServerConfig;
+}
+
 module.exports = {
     applyCracoConfigPlugins,
     applyWebpackConfigPlugins,
-    applyJestConfigPlugins
+    applyJestConfigPlugins,
+    applyDevServerConfigPlugins
 };
