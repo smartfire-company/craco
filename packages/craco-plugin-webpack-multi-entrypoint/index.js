@@ -1,16 +1,12 @@
-/* craco-plugin-webpack-multi-entrypoint.js */
-
 const path = require("path");
-const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { whenDev } = require("@craco/craco");
 
-const appEntryKey = "app";
+const APP_ENTRY_KEY = "app";
 
 const addEntrypoints = (webpackConfig, entrypoints) => {
     webpackConfig.entry = {
         // Reassign original entry to named 'app' configuration
-        [appEntryKey]: webpackConfig.entry
+        [APP_ENTRY_KEY]: webpackConfig.entry
     };
 
     Object.keys(entrypoints).forEach(entryKey => {
@@ -25,11 +21,11 @@ const chunkOutput = webpackConfig => {
     webpackConfig.output.filename = `${output.dir}/[name].${output.name}${output.ext}`;
 };
 
-const addHtmlOutputs = (webpackConfig, entrypoints, outputs, paths) => {
+const addHtmlOutputs = (webpackConfig, entrypoints, outputs, paths, env) => {
     // Reassign original html to named 'app' chunck
     webpackConfig.plugins = webpackConfig.plugins.map(plugin => {
         if (plugin.constructor.name === "HtmlWebpackPlugin" && plugin.options.filename === "index.html") {
-            plugin.options.chunks = [appEntryKey];
+            plugin.options.chunks = [APP_ENTRY_KEY];
         }
 
         return plugin;
@@ -57,20 +53,25 @@ module.exports = {
         const { entrypoints, outputs } = pluginOptions;
 
         webpackConfig = addEntrypoints(webpackConfig, entrypoints);
-        webpackConfig = addHtmlOutputs(webpackConfig, entrypoints, outputs, paths);
-        whenDev(() => chunkOutput(webpackConfig));
+        webpackConfig = addHtmlOutputs(webpackConfig, entrypoints, outputs, paths, env);
 
-        fs.writeFileSync("c:\\temp\\webpackConfig.json", JSON.stringify(webpackConfig));
+        if (env === "development") {
+            chunkOutput(webpackConfig);
+        }
 
         return webpackConfig;
     },
-    devServerRewrites: entrypoints => {
-        const devServerRewrites = Object.keys(entrypoints).map(entryKey => {
-            return { from: new RegExp(`^/${entryKey}.html`), to: `/build/${entryKey}.html` };
-        });
+    overrideDevServerConfig: ({ devServerConfig, cracoConfig, pluginOptions, context: { env, paths } }) => {
+        const { entrypoints, rewriteRules } = pluginOptions;
+        const defaultRewriteRules = entrypoints => {
+            return Object.keys(entrypoints).map(entryKey => {
+                return { from: new RegExp(`^/${entryKey}.html`), to: `/build/${entryKey}.html` };
+            });
+        };
 
-        fs.writeFileSync("c:\\temp\\devServerRewrites.json", JSON.stringify(devServerRewrites));
+        const rewrites = rewriteRules || defaultRewriteRules;
+        devServerConfig.historyApiFallback.rewrites = rewrites(entrypoints);
 
-        return devServerRewrites;
+        return devServerConfig;
     }
 };
