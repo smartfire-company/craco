@@ -33,10 +33,10 @@
         "craco": "./bin/craco.js"
     },
     "peerDependencies": {
-        "react-scripts": "^4.0.0"
+        "react-scripts": "^5.0.0-next.47"
     },
     "devDependencies": {
-        "react-scripts": "4.*"
+        "react-scripts": "^5.0.0-next.47"
     },
     "dependencies": {
         "cosmiconfig": "^7.0.1",
@@ -45,6 +45,6 @@
         "semver": "^7.3.2",
         "webpack-merge": "^4.2.2"
     },
-    "version": "6.4.2",
+    "version": "7.0.0",
     "gitHead": "9c9c5e5ee1f79a17af4809945573bfdbdcc912be"
 }
